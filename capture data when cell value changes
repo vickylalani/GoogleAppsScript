@@ -1,0 +1,94 @@
+function onChange(e) {
+  // This script records changes when particular cell values are changed in the spreadsheet. They are recorded in a "Purchase", "Sales" and "Changelog" sheet.
+  
+  /*The "Purchase" sheet includes these columns:
+  ["Timestamp", "Sheet name", "Description", "Quantity Bought",	"Purchase Price", "App / Manual"]
+  */
+  
+  /*The "Sales" sheet includes these columns:
+  ["Timestamp", "Sheet name", "Description", "Quantity Sold",	"Sales Price", "App / Manual"]
+  */
+  
+  /*The changelog sheet includes these columns:
+  ["Timestamp", "Sheet name", "Product Description", "Column", "Cell address", "New value entered", "Old Value", "Change In Value"]
+  */
+  
+  //Add the name of the sheets to watch for changes
+  const sheetsToWatch = ['Mobil', 'Grease', 'Tyre', 'Battery & Inverter', 'JCB Pipes', 'add more sheets'];
+  
+  // name of the sheet where the Changelog is stored
+  const changelogSheetName = "Tracking Changes";
+  
+  //name of the Sales sheet
+  const salesSheetName = "Sales";
+  
+  //name of the Purchase sheet
+  const purchaseSheetName = "Purchase";
+  
+  const origValue = e.oldValue; //orignial value of the cell before the value was changed manually
+  const timestamp = new Date(); //datetime of the change
+  const ss = SpreadsheetApp.getActiveSpreadsheet(); //Active Spradsheet you are working on
+  const sheet = ss.getActiveSheet(); //active sheet in the spreadsheet in which the change was made
+  const cell = sheet.getActiveCell(); //cell in the active sheet where the change was made
+  const sheetName = sheet.getName(); //name of the active sheet
+
+
+  // if it is the changelog sheet that is being edited, do not record the change
+  if (sheetName == changelogSheetName) return;
+
+  // if the sheet name does not appear in sheetsToWatch, do not record the change
+  let matchFound = false;
+  
+  for (let i = 0; i < sheetsToWatch.length; i++) {
+  
+   if (sheetName.match(sheetsToWatch[i])) matchFound = true;
+   
+  };
+  
+  if (!matchFound) return;
+
+  var columnLabel = sheet.getRange(/* row 3 */ 1, cell.getColumn()).getValue(); //Column header of the cell where the change was made
+  var rowLabel = sheet.getRange(cell.getRow(), /* column B */ 18).getValue(); // First Row Value of the cell where the change was made
+  var changeInValue = cell.getValue() - origValue; //Difference in the value between the old value of the cell and the new value
+  
+  // first record change in changeLogSheet
+  const changelogSheet = ss.getSheetByName(changelogSheetName);
+  
+  if (!changelogSheet) {
+  
+    // no changelog sheet found, create it as the last sheet in the spreadsheet
+    changelogSheet = ss.insertSheet(changelogSheetName, ss.getNumSheets());
+    
+    Utilities.sleep(2000); // give time for the new sheet to render before going back
+    
+    //add new row with the below values in the changelog sheet 
+    changelogSheet.appendRow(["Email","Timestamp", "Sheet name", "Product Description", "Column label", "Cell address", "New value entered", "Old Value", "Change In Value"]);
+    
+    changelogSheet.setFrozenRows(1); //Set the first row as Frozen
+    
+  }
+  //if changelog sheet already exists
+  changelogSheet.appendRow([Session.getActiveUser().getEmail(), timestamp, sheetName, rowLabel, columnLabel, cell.getA1Notation(), cell.getValue(), origValue, changeInValue]);
+  
+  Utilities.sleep(1000);
+  
+  //If the cell value where change occurred has the column header "Boxes" or "Quantity" then only the change will be capture in either Sales or Purchase sheet
+  if(columnLabel == "Boxes" || columnLabel == "Quantity") {
+  
+    const salesSheet = ss.getSheetByName(salesSheetName);
+    const purchaseSheet = ss.getSheetByName(purchaseSheetName);
+    
+    if(changeInValue<0) {
+    
+      salesSheet.appendRow([timestamp, sheetName, rowLabel, Math.abs(changeInValue)]);
+    
+    }
+    
+    if(changeInValue>0) {
+    
+      purchaseSheet.appendRow([timestamp, sheetName, rowLabel, changeInValue]);
+      
+    }
+    
+  }
+}
