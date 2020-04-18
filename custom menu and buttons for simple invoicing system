@@ -1,0 +1,430 @@
+//Custome Menu Creation
+function onOpen() {
+    var ui = SpreadsheetApp.getUi();
+        ui.createMenu('Vinit Enterprises')
+          .addSubMenu(ui.createMenu('SalePerson1')
+                      .addItem('Add 5 Rows - SP1', 'addRows1')
+                      .addSeparator()
+                      .addItem('Delete Empty Rows - SP1','deleteEmptyRows1')
+                      .addSeparator()
+                      .addItem('Click to Clear Data - SP1','clickToClearData1')
+                      .addSeparator()
+                      .addItem('Save & Print - SP1','saveToPdf1'))
+          .addSubMenu(ui.createMenu('SalePerson2')
+                      .addItem('Add 5 Rows - SP2', 'addRows2')
+                      .addSeparator()
+                      .addItem('Delete Empty Rows - SP2','deleteEmptyRows2')
+                      .addSeparator()
+                      .addItem('Click to Clear Data - SP2','clickToClearData2')
+                      .addSeparator()
+                      .addItem('Save & Print - SP2','saveToPdf2'))
+          .addSubMenu(ui.createMenu('SalePerson3')
+                      .addItem('Add 5 Rows - SP3', 'addRows3')
+                      .addSeparator()
+                      .addItem('Delete Empty Rows - SP3','deleteEmptyRows3')
+                      .addSeparator()
+                      .addItem('Click to Clear Data - SP3','clickToClearData3')
+                      .addSeparator()
+                      .addItem('Save & Print - SP3','saveToPdf3'))
+          .addSubMenu(ui.createMenu('SalePerson4')
+                      .addItem('Add 5 Rows - SP4', 'addRows4')
+                      .addSeparator()
+                      .addItem('Delete Empty Rows - SP4','deleteEmptyRows4')
+                      .addSeparator()
+                      .addItem('Click to Clear Data - SP4','clickToClearData4')
+                      .addSeparator()
+                      .addItem('Save & Print - SP4','saveToPdf4'))
+          .addToUi();
+}
+
+//THIS FUNCTION IS RUN WHEN CUSTOM MENU ITEM 'CLICK TO CLEAR DATA - SP1' IS SELECTED
+function clickToClearData1() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("SalePerson1");
+  var lastRow = sheet.getLastRow();
+  
+  var Range1 = sheet.getRange(6, 2, lastRow-9, 5);
+  Range1.clearContent();
+  
+  var Range2 = sheet.getRange(6,7,lastRow-9,1);
+  var formula = '=(IF(REGEXMATCH(R[0]C[-5],"SHEET"),((R[0]C[-1]*R[0]C[-3])/IFS(OR(R[0]C[-2]="BUNDLE",R[0]C[-2]="BAG",R[0]C[-2]="BOX",R[0]C[-2]="CARTON"),VLOOKUP(R[0]C[-5],ListOfItems!C1:C4,3,FALSE),OR(R[0]C[-2]="PCS",R[0]C[-2]="PKT",R[0]C[-2]="PCH",R[0]C[-2]="NOS"),VLOOKUP(R[0]C[-5],ListOfItems!C1:C4,2,FALSE),R[0]C[-2]<>"",1)),R[0]C[-3]*R[0]C[-1]))';
+  Range2.setFormulaR1C1(formula);
+  
+  var Range3 = sheet.getRange(lastRow-3, 7,1,1);
+  Range3.setValue(0);
+  
+  var Range4 = sheet.getRange(lastRow-1, 7,1,1);
+  Range4.setValue(0);
+  
+}
+
+//THIS FUNCTION IS RUN WHEN CUSTOM MENU ITEM 'ADD 5 ROWS - SP1' IS SELECTED
+function addRows1() {
+  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("SalePerson1");
+  var rowLast = sheet.getLastRow();
+  
+  sheet.insertRowsAfter(rowLast-4, 5); // inserts rows after (lastRow-4) row number
+  for(var i=0;i<5;i++){ // a loop to add serial numbers in column 1 and merge columns 2 & 3 in the newly added rows 
+    sheet.getRange(rowLast+i-3, 1).setValue(rowLast-6+i); // Adds serial numbers in column 1 in the newly added rows
+    sheet.getRange(rowLast+i-3, 2, 1, 2).merge(); // merges columns 2 & 3 in the newly added rows
+  }
+  
+  var columnLast = sheet.getLastColumn();
+  //var formula1 = sheet.getRange(6,6).getFormulaR1C1(); // picking up formula from row-6 and column-6
+  
+  var formula2 = '=(IF(REGEXMATCH(R[0]C[-5],"SHEET"),((R[0]C[-1]*R[0]C[-3])/IFS(OR(R[0]C[-2]="BUNDLE",R[0]C[-2]="BAG",R[0]C[-2]="BOX",R[0]C[-2]="CARTON"),VLOOKUP(R[0]C[-5],ListOfItems!C1:C4,3,FALSE),OR(R[0]C[-2]="PCS",R[0]C[-2]="PKT",R[0]C[-2]="PCH",R[0]C[-2]="NOS"),VLOOKUP(R[0]C[-5],ListOfItems!C1:C4,2,FALSE),R[0]C[-2]<>"",1)),R[0]C[-3]*R[0]C[-1]))';
+  
+  for (var j=rowLast-3; j<rowLast+2; j++) {
+    for (var k=1; k<=columnLast; k++) {
+      sheet.getRange(j,k).setBorder(true, true, true, true, false, false,"black",SpreadsheetApp.BorderStyle.SOLID); //sets the border for each cell in the newly added rows
+      //sheet.getRange(i,j).setFontSize(16);
+      
+      //copy formula from previous row to newly added rows in column 6
+      /*
+      if (j==6) {
+        //var formula = sheet.getRange(i-1,j).getFormulaR1C1();
+        sheet.getRange(i,j).setFormulaR1C1(formula1); // pasting formula into column 6 of newly added row
+      }
+      */
+      
+      //copy formula from previous row to newly added rows in column 8
+      if (k==7) {
+        //var formula = sheet.getRange(i-1,j).getFormulaR1C1();
+        sheet.getRange(j,k).setFormulaR1C1(formula2); // pasting formula into column 8 of newly added row
+      }
+    }
+  }
+  
+}
+
+//THIS FUNCTION IS RUN WHEN CUSTOM MENU ITEM 'DELETE EMPTY ROWS - SP1' IS SELECTED
+function deleteEmptyRows1() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("SalePerson1");
+  
+  var rows = sheet.getDataRange();
+  //Logger.log(rows);
+  var numRows = rows.getNumRows();
+  //Logger.log(numRows);
+  var values = rows.getValues();
+  //Logger.log(values);
+
+  var rowsDeleted = 0;
+  for (var i = 5; i < numRows - 4; i++) {
+    var row = values[i];
+    //Logger.log(row);
+    if (row[1] == 0 || row[1] == '') {
+      sheet.deleteRow((parseInt(i)+1) - rowsDeleted);
+      rowsDeleted++;
+      //Logger.log(rowsDeleted);
+    }
+  }
+}
+
+//THIS FUNCTION IS RUN WHEN CUSTOM BUTTON ITEM 'S' ON THE SCREEN IS SELECTED AND IS USED AS A FUNCTION WITHIN 'SAVETOPDF1' & 'PRINTPDF1' TO AUTOMATICALLY CREATE A FOLDER FOR TODAY IF NOT ALREADY CREATED
+//check folder if does not exists only
+function createFolder(FOLDER_ID, NEW_FOLDER_NAME) {
+  
+  var parentFolder = DriveApp.getFolderById(FOLDER_ID);
+  var subFolders = parentFolder.getFolders();
+  var doesntExists = true;
+  var newFolder = "";
+
+//check if folder already exists
+while(subFolders.hasNext()) {
+  
+  var folder = subFolders.next();
+  
+  //If the name exists return the id of the folder
+  if(folder.getName() === NEW_FOLDER_NAME) {
+    
+    doesntExists = false;
+    newFolder = folder;
+    return newFolder.getId();
+ 
+  };
+};
+  
+  //If the name doesn't exists, then create a new folder
+  if(doesntExists = true){
+    
+    //If the file doesnt exists
+    newFolder = parentFolder.createFolder(NEW_FOLDER_NAME);
+    return newFolder.getId();
+    
+  };
+  
+};
+
+//THIS FUNCTION IS RUN WHEN CUSTOM BUTTON ITEM 'S' ON THE SCREEN IS SELECTED - IT SAVES THE FILE IN THE DRIVE BUT DOES NOT PRINT IT
+function saveToPdf1() {
+  
+  var sheetName = "SalePerson1";
+  //Add your own folder id here
+  var FOLDER_ID = "INSERT_FOLDER_ID_ONLY";
+  
+  var sourceSpreadsheet = SpreadsheetApp.getActive();
+  var sourceSheet = sourceSpreadsheet.getSheetByName(sheetName);
+  var sourceValues = sourceSheet.getRange(1,1,sourceSheet.getMaxRows(),sourceSheet.getMaxColumns()).getValues();
+  
+  var customerName = sourceSheet.getRange(2, 2).getValue();
+  var pdfName = customerName+" "+Date();
+  
+  // Add the name of your folder here
+  if(customerName != "CASH"){
+    var NEW_FOLDER_NAME = customerName+"-"+Utilities.formatDate(new Date(), "GMT+5:30", "dd/MM/yyyy");
+    var folderID = createFolder(FOLDER_ID, NEW_FOLDER_NAME);
+    var folder = DriveApp.getFolderById(folderID);
+  } else{
+    var NEW_FOLDER_NAME = "CASH-"+Utilities.formatDate(new Date(), "GMT+5:30", "dd/MM/yyyy");
+    var folderID = createFolder(FOLDER_ID, NEW_FOLDER_NAME);
+    var folder = DriveApp.getFolderById(folderID);
+  }
+  //Copy whole spreadsheet
+  var destSpreadsheet = SpreadsheetApp.open(DriveApp.getFileById(sourceSpreadsheet.getId()).makeCopy(pdfName,folder));
+
+  var destSheet = destSpreadsheet.getSheetByName("SalePerson1");
+  //replace cell values with text (to avoid broken references)
+  var destinationRange = destSheet.getRange(1,1,destSheet.getMaxRows(),destSheet.getMaxColumns());
+  destSheet.getRange(1,1,destSheet.getMaxRows(),destSheet.getMaxColumns()).setValues(sourceValues);
+  destinationRange.setBackground("White");
+
+  //delete redundant sheets
+  var sheets = destSpreadsheet.getSheets();
+  for (i = 0; i < sheets.length; i++) {
+    if (sheets[i].getSheetName() != sheetName){
+      destSpreadsheet.deleteSheet(sheets[i]);
+    }
+  }
+  
+ 
+  // Base URL
+  const url = 'https://docs.google.com/spreadsheets/d/SS_ID/export?'.replace('SS_ID', destSpreadsheet.getId());
+
+  /* Specify PDF export parameters
+  From: https://code.google.com/p/google-apps-script-issues/issues/detail?id=3579
+  */
+
+  const exportOptions =
+    'exportFormat=pdf&format=pdf' + // export as pdf / csv / xls / xlsx
+    '&size=A5' + // paper size legal / letter / A4
+    '&portrait=true' + // orientation, false for landscape
+    '&fitw=true' + // fit to page width, false for actual size
+    '&top_margin=0.2' + //All four margins must be set!
+    '&bottom_margin=0.10' + //All four margins must be set!
+    '&left_margin=0.20' + //All four margins must be set!
+    '&right_margin=0.25' + //All four margins must be set!
+    '&sheetnames=false&printtitle=false' + // hide optional headers and footers
+    '&pagenum=CENTER' + // CENTER = show page numbers / UNDEFINED = do not show
+    '&gridlines=false' + // hide gridlines
+    '&fzr=false' + // do not repeat row headers (frozen rows) on each page
+    '&background_colour=false' + // remove background colour
+    '&gid='; // the sheet's Id
+
+  const token = ScriptApp.getOAuthToken();
+  
+  const response = UrlFetchApp.fetch(url + exportOptions + destSheet.getSheetId(), {
+      headers: {
+        Authorization: 'Bearer ' + token
+        }});
+  
+  DriveApp.getFileById(destSpreadsheet.getId()).setTrashed(true);
+  var blob = response.getBlob().getAs('application/pdf').setName(pdfName);
+  var newFile = folder.createFile(blob);
+  var newFileID = newFile.getId();
+  
+  if(customerName!="CASH"){
+    
+    var destination = "datadrive.vinit@gmail.com";
+    var target = Session.getActiveUser().getEmail() ;
+    folder.setOwner(destination).revokePermissions(target);
+
+  }
+  
+}
+
+//THIS FUNCTION IS RUN WHEN CUSTOM BUTTON ITEM 'P' ON THE SCREEN IS SELECTED - IT PRINTS THE FILE BUT DOES NOT SAVE IT
+function printPdf1(){
+  
+  var sheetName = "SalePerson1";
+  //Add your own folder id here
+  var FOLDER_ID = "INSERT_FOLDER_ID_ONLY";
+  // Add the name of your folder here
+  var NEW_FOLDER_NAME = Utilities.formatDate(new Date(), "GMT+5:30", "dd/MM/yyyy");
+  
+  var folderID = createFolder( FOLDER_ID, NEW_FOLDER_NAME);
+  var folder = DriveApp.getFolderById(folderID);
+  
+  
+  var sourceSpreadsheet = SpreadsheetApp.getActive();
+  var sourceSheet = sourceSpreadsheet.getSheetByName(sheetName);
+  var sourceValues = sourceSheet.getRange(1,1,sourceSheet.getMaxRows(),sourceSheet.getMaxColumns()).getValues();
+  
+  var customerName = sourceSheet.getRange(2, 2).getValue();
+  
+  var pdfName = customerName+" "+Date();
+ 
+  
+  //Copy whole spreadsheet
+  var destSpreadsheet = SpreadsheetApp.open(DriveApp.getFileById(sourceSpreadsheet.getId()).makeCopy(pdfName,folder));
+  var destSheet = destSpreadsheet.getSheetByName("SalePerson1");
+  
+  //replace cell values with text (to avoid broken references)
+  var destinationRange = destSheet.getRange(1,1,destSheet.getMaxRows(),destSheet.getMaxColumns());
+  destSheet.getRange(1,1,destSheet.getMaxRows(),destSheet.getMaxColumns()).setValues(sourceValues);
+  destinationRange.setBackground("White");
+
+  //delete redundant sheets
+  var sheets = destSpreadsheet.getSheets();
+  
+  for (i = 0; i < sheets.length; i++) {
+    
+    if (sheets[i].getSheetName() != sheetName){
+      
+      destSpreadsheet.deleteSheet(sheets[i]);
+      
+    }
+    
+  }
+  
+  
+  // Base URL
+  const url = 'https://docs.google.com/spreadsheets/d/SS_ID/export?'.replace('SS_ID', destSpreadsheet.getId());
+
+  /* Specify PDF export parameters
+  From: https://code.google.com/p/google-apps-script-issues/issues/detail?id=3579
+  */
+
+  const exportOptions =
+    'exportFormat=pdf&format=pdf' + // export as pdf / csv / xls / xlsx
+    '&size=A5' + // paper size legal / letter / A4
+    '&portrait=true' + // orientation, false for landscape
+    '&fitw=true' + // fit to page width, false for actual size
+    '&top_margin=0.2' + //All four margins must be set!
+    '&bottom_margin=0.10' + //All four margins must be set!
+    '&left_margin=0.20' + //All four margins must be set!
+    '&right_margin=0.25' + //All four margins must be set!
+    '&sheetnames=false&printtitle=false' + // hide optional headers and footers
+    '&pagenum=CENTER' + // CENTER = show page numbers / UNDEFINED = do not show
+    '&gridlines=false' + // hide gridlines
+    '&fzr=false' + // do not repeat row headers (frozen rows) on each page
+    '&background_colour=false' + // remove background colour
+    '&gid='; // the sheet's Id
+
+  const token = ScriptApp.getOAuthToken();
+  
+  const response = UrlFetchApp.fetch(url + exportOptions + destSheet.getSheetId(), {
+      headers: {
+        Authorization: 'Bearer ' + token
+        }});
+  
+  
+  var blob = response.getBlob().getAs('application/pdf').setName(pdfName);
+  var newFile = folder.createFile(blob);
+  var newFileID = newFile.getId();
+  
+  //print google sheet
+  printGoogleDocument(newFileID,pdfName);
+  
+  //Delete the temporary sheet
+  DriveApp.getFileById(destSpreadsheet.getId()).setTrashed(true);
+  
+  //Delete the pdf created 
+  DriveApp.getFileById(newFileID).setTrashed(true);
+  
+}
+
+//THIS IS THE CODE NEEDED FOR DIRECT PRINTING YOUR FILE - IT DOES NOT SHOW THE PRINT DIALOG BOX - THERE ARE A NUMBER OF STEPS NEEDED TO RUN THIS WHICH WILL BE EXPLIANED IN THE TUTORIAL ON MEDIUM
+function showURL() {
+  var cpService = getCloudPrintService();
+  if (!cpService.hasAccess()) {
+    Logger.log(cpService.getAuthorizationUrl());
+  }
+}
+
+function getCloudPrintService() {
+  return OAuth2.createService('print')
+    .setAuthorizationBaseUrl('https://accounts.google.com/o/oauth2/auth')
+    .setTokenUrl('https://accounts.google.com/o/oauth2/token')
+    .setClientId('CLIENT_ID') //THIS INFO IS DERIVED FROM THE GOOGLE CLOUD CONSOLE ASSOCIATED WITH YOUR ACCOUNT - YOU HAVE TO CREATE AN OAUTH2 ID
+    .setClientSecret('CLIENT_SECRET') //THIS INFO IS DERIVED FROM THE GOOGLE CLOUD CONSOLE ASSOCIATED WITH YOUR ACCOUNT - YOU HAVE TO CREATE AN OAUTH2 ID
+    .setCallbackFunction('authCallback')
+    .setPropertyStore(PropertiesService.getUserProperties())
+    .setScope('https://www.googleapis.com/auth/cloudprint')
+    .setParam('login_hint', Session.getActiveUser().getEmail())
+    .setParam('access_type', 'offline')
+    .setParam('approval_prompt', 'force');
+}
+
+function authCallback(request) {
+  var isAuthorized = getCloudPrintService().handleCallback(request);
+  if (isAuthorized) {
+    return HtmlService.createHtmlOutput('You can now use Google Cloud Print from Apps Script.');
+  } else {
+    return HtmlService.createHtmlOutput('Cloud Print Error: Access Denied');
+  }
+}
+
+//Getting the list of printers
+function getPrinterList() {
+
+  var response = UrlFetchApp.fetch('https://www.google.com/cloudprint/search', {
+    headers: {
+      Authorization: 'Bearer ' + getCloudPrintService().getAccessToken()
+    },
+    muteHttpExceptions: true
+  }).getContentText();
+
+  var printers = JSON.parse(response).printers;
+
+  for (var p in printers) {
+    Logger.log("%s %s %s", printers[p].id, printers[p].name, printers[p].description);
+  }
+}
+
+
+//Printing Google Document
+function printGoogleDocument(docID, docName) {
+  var printerID = "PRINTER_ID"; //PRINTER_ID IS DERIVED AFTER YOU HAVE ADDED THE PRINTER TO GOOGLE CLOUD PRINT FROM YOUR CHROME BROWSER ON YOUR DESKTOP
+  var ticket = {
+    version: "1.0",
+    print: {
+      color: {
+        type: "STANDARD_MONOCHROME",
+        vendor_id: "Monochrome"
+      },
+      duplex: {
+        type: "NO_DUPLEX"
+      }
+    }
+  };
+
+  var payload = {
+    "printerid" : printerID,
+    "title"     : docName,
+    "content"   : DriveApp.getFileById(docID).getBlob(),
+    "contentType": "application/pdf",
+    "ticket"    : JSON.stringify(ticket)
+  };
+
+  var response = UrlFetchApp.fetch('https://www.google.com/cloudprint/submit', {
+    method: "POST",
+    payload: payload,
+    headers: {
+      Authorization: 'Bearer ' + getCloudPrintService().getAccessToken()
+    },
+    "muteHttpExceptions": true
+  });
+
+  response = JSON.parse(response);
+
+  if (response.success) {
+    Logger.log("%s", response.message);
+  } else {
+    Logger.log("Error Code: %s %s", response.errorCode, response.message);
+  }
+}
+
